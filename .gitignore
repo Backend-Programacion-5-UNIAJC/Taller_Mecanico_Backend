@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.log
+.Ds_Store
+academia-api/package.json
+academia-api/package-lock.json
+postman/
+.postman/
+doc/
