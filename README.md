@@ -1,4 +1,4 @@
-# # Taller Mecánico API
+## Taller Mecánico API
 
 Dominio: Sistema backend para la gestión de un taller mecánico, permitiendo el registro de vehículos atendidos y la administración de mecánicos y órdenes de servicio.
 
