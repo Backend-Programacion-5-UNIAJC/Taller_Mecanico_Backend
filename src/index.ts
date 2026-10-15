@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Servidor de AcademiaAPI funcionando correctamente');
+  res.send('Servidor de Taller Mecanico funcionando correctamente');
 });
 
 //app.use('/courses', courseRoutes);
