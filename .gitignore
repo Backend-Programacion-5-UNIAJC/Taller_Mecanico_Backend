@@ -1,0 +1,6 @@
+node_modules/
+.env
+*.log
+.Ds_Store
+Taller_Mecanico_Backend/package.json
+Taller_Mecanico_Backend/package-lock.json
