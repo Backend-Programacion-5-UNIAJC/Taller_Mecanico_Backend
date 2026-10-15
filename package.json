@@ -1,0 +1,31 @@
+{
+  "name": "taller_mecanico_backend",
+  "version": "1.0.0",
+  "description": "Dominio: Sistema backend para la gestión de un taller mecánico, permitiendo el registro de vehículos atendidos y la administración de mecánicos y órdenes de servicio.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Backend-Programacion-5-UNIAJC/Taller_Mecanico_Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Backend-Programacion-5-UNIAJC/Taller_Mecanico_Backend/issues"
+  },
+  "homepage": "https://github.com/Backend-Programacion-5-UNIAJC/Taller_Mecanico_Backend#readme",
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.0"
+  }
+}
