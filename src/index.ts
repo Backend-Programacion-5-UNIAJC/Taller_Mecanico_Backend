@@ -1,6 +1,6 @@
 import express from 'express';
 import mechanicRoutes from './routes/mechanic.route';
-//import serviceOrderRoutes from './routes/serviceOrder.routes';
+import serviceOrderRoutes from './routes/serviceOrder.routes';
 import vehicleRoutes from './routes/vehicle.routes';
 
 const app = express();
@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/mechanics', mechanicRoutes);
-//app.use('/serviceOrders', serviceOrderRoutes);
+app.use('/serviceOrders', serviceOrderRoutes);
 app.use('/vehicles', vehicleRoutes);
 
 app.listen(PORT, () => {
