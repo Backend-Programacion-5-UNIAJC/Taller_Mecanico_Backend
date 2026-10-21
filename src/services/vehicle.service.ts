@@ -9,8 +9,9 @@ export function findVehicleById(id: number): Vehicle | undefined {
     return vehicles.find(v => v.id === id);
 }
 
-export function creteVehicle (data:Omit<Vehicle, 'id'>): Vehicle {
+export function createVehicle (data:Omit<Vehicle, 'id'>): Vehicle {
     const newVehicle: Vehicle = {id: nextId++, ...data};
+    vehicles.push(newVehicle)
     return newVehicle
 }
 

@@ -20,7 +20,7 @@ export function createVehicle (req: Request, res: Response) {
     if(!plate || !brand || !model || !ownerName) {
         return res.status(400).json({error: 'plate,brand,model y ownerName son obligatorios'});
     }
-    const vehicle = vehicleService.creteVehicle({plate,brand,model,ownerName});
+    const vehicle = vehicleService.createVehicle({plate,brand,model,ownerName});
     res.status(201).json(vehicle);
 }
 
