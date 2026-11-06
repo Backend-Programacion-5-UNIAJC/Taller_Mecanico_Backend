@@ -6,9 +6,54 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum OrderStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
+    CANCELLED
+}
+
+enum Role {
+    ADMIN
+    MECHANIC
+    CLIENT
+}
+
+model User {
+    id          Int     @id @default(autoincrement())
+    name        String
+    email       String  @unique
+    password    String
+    role        Role    @default(CLIENT)
+    mechanic    Mechanic?
+}
+
 model Mechanic {
-    id Int @id @default(autoincrement())
-    name String
-    specialty String
-    email String
+    id          Int     @id @default(autoincrement())
+    name        String
+    userId      Int?    @unique
+    user        User?   @relation(fields: [userId], references: [id])
+    specialty   String
+    email       String  @unique
+    serviceOrders ServiceOrder[]
+}
+
+model Vehicle {
+    id              Int         @id @default(autoincrement())
+    plate           String      @unique
+    brand           String
+    model           String
+    ownerName       String
+    serviceOrders   ServiceOrder[]
+}
+
+model ServiceOrder {
+    id          Int         @id @default(autoincrement())
+    vehicleId   Int         @unique
+    vehicle     Vehicle     @relation(fields: [vehicleId], references: [id])
+    mechanicId  Int?        @unique
+    mechanic    Mechanic?   @relation(fields:[mechanicId], references: [id])
+    description String
+    fecha       DateTime    @default(now())
+    status      OrderStatus @default(PENDING)
 }
