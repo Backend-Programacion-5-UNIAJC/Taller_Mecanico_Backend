@@ -1,25 +1,26 @@
 import { Prisma } from "@prisma/client";
 import {prisma} from "../lib/prisma"
-import { Mechanic, MechanicInput} from "../models/mechanic.model"
+import { Mechanic } from '@prisma/client';
+
 
 function isNotFound( error: unknown): boolean {
     return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025';
 }
 export function findAll () {
-    return prisma.course.findMany({ orderBy: {id: "asc"}});
+    return prisma.mechanic.findMany({ orderBy: {id: "asc"}});
 }
 
 export function findById(id: number){
-    return prisma.course.findUnique({ where: {id}});
+    return prisma.mechanic.findUnique({ where: {id}});
 }
 
-export function create(data: MechanicInput) {
-    return prisma.course.create({ data });
+export function create(data: Mechanic) {
+    return prisma.mechanic.create({ data });
 } 
 
-export async function update( id: number, data: Partial<MechanicInput>) {
+export async function update( id: number, data: Partial<Mechanic>) {
     try{
-        return await prisma.course.update({ where: {id}, data});
+        return await prisma.mechanic.update({ where: {id}, data});
     }catch(error){
         if(isNotFound(error)) return null;
         throw error;
