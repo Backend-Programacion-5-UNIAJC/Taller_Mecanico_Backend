@@ -1,0 +1,7 @@
+$kind: http-request
+description: ""
+url: http://localhost:3000/auth/me
+method: GET
+headers:
+  Authorization: "{{bearer_token_199s}}"
+order: 2000
