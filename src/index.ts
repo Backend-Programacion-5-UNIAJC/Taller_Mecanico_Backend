@@ -3,6 +3,7 @@ import mechanicRoutes from './routes/mechanic.route';
 import serviceOrderRoutes from './routes/serviceOrder.routes';
 import vehicleRoutes from './routes/vehicle.routes';
 import authRoutes from './routes/auth.routes';
+import 'dotenv/config';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
