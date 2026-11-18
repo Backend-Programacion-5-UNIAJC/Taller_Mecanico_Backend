@@ -1,0 +1,19 @@
+$kind: http-request
+url: http://localhost:3000/auth/register
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Edward\",\r
+
+    \  \"email\": \"edward@taller.com\",\r
+
+    \  \"password\": \"Clave123*\",\r
+
+    \  \"role\": \"ADMIN\"\r
+
+    }"
+order: 1000

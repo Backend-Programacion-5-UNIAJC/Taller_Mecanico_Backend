@@ -1,30 +1,42 @@
-import { Vehicle, vehicles} from "../data/vehicle";
+import { prisma } from "../lib/prisma";
 
-let nextId =5;
-export function listVehicles(): Vehicle[] {
-    return vehicles;
+export async function listVehicles() {
+    return prisma.vehicle.findMany({
+        orderBy: { id: "asc" }
+    });
 }
 
-export function findVehicleById(id: number): Vehicle | undefined {
-    return vehicles.find(v => v.id === id);
+export async function findVehicleById(id: number) {
+    return prisma.vehicle.findUnique({
+        where: { id },
+        include: { serviceOrders: true } // Opcional: incluye sus órdenes si lo necesitas
+    });
 }
 
-export function createVehicle (data:Omit<Vehicle, 'id'>): Vehicle {
-    const newVehicle: Vehicle = {id: nextId++, ...data};
-    vehicles.push(newVehicle)
-    return newVehicle
+export async function createVehicle(data: { plate: string; brand: string; model: string; ownerName: string }) {
+    return prisma.vehicle.create({
+        data
+    });
 }
 
-export function updateVehicle (id: number, data: Partial<Vehicle>): Vehicle | undefined {
-    const vehicle = findVehicleById(id);
-    if(!vehicle) return undefined;
-    Object.assign(vehicle, data);
-    return vehicle;
+export async function updateVehicle(id: number, data: Partial<{ plate: string; brand: string; model: string; ownerName: string }>) {
+    try {
+        return await prisma.vehicle.update({
+            where: { id },
+            data
+        });
+    } catch (error) {
+        return null; // Si no existe o hay conflicto, manejas el null en el controlador
+    }
 }
 
-export function deleteVehicle(id: number): boolean {
-    const index = vehicles.findIndex (v=> v.id === id);
-    if(index === -1)return false;
-    vehicles.splice(index,1);
-    return true;
+export async function deleteVehicle(id: number): Promise<boolean> {
+    try {
+        await prisma.vehicle.delete({
+            where: { id }
+        });
+        return true;
+    } catch (error) {
+        return false; // Retorna false si el vehículo no existe
+    }
 }

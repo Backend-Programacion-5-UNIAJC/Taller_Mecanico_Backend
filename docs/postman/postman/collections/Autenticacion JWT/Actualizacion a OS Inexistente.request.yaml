@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:3000/serviceOrders/9999
+method: PUT
+headers:
+  Authorization: Bearer {{tokenMecanico}}
+order: 9000

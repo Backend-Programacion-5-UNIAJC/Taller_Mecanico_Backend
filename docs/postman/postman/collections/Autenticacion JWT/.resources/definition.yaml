@@ -3,3 +3,15 @@ variables:
   - key: bearer_token_199s
     secret: true
     disabled: false
+  - key: tokenAdmin
+    value: ""
+    disabled: false
+  - key: tokenMario
+    value: ""
+    disabled: false
+  - key: tokenCliente
+    value: ""
+    disabled: false
+  - key: tokenMecanico
+    value: ""
+    disabled: false

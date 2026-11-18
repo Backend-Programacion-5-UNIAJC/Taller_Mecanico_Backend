@@ -1,0 +1,19 @@
+$kind: http-request
+url: http://localhost:3000/auth/login
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"admin@taller.com\",\r
+
+    \  \"password\": \"Clave123*\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('tokenAdmin', pm.response.json().token);
+    language: text/javascript
+order: 2000
