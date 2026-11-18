@@ -1,31 +1,42 @@
-import { Mechanic, mechanics } from "../data/mechanic";
+import { prisma } from "../lib/prisma";
 
-let nextId = 5;
-
-export function listMechanics(): Mechanic[] {
-    return mechanics
+export async function listMechanics() {
+    return prisma.mechanic.findMany({
+        orderBy: { id: "asc" }
+    });
 }
 
-export function findMechanicById(id: number): Mechanic | undefined {
-    return mechanics.find( c => c.id === id);
+export async function findMechanicById(id: number) {
+    return prisma.mechanic.findUnique({
+        where: { id },
+        include: { serviceOrders: true }
+    });
 }
 
-export function createMechanic(data: Omit<Mechanic, 'id' >): Mechanic {
-    const newMechanic: Mechanic = { id: nextId++, ...data};
-    mechanics.push(newMechanic);
-    return newMechanic
+export async function createMechanic(data: { name: string; specialty: string; email: string }) {
+    return prisma.mechanic.create({
+        data
+    });
 }
 
-export function updateMechanic(id: number, data: Partial<Mechanic>): Mechanic | undefined {
-    const mechanic = findMechanicById(id);
-    if (!mechanic) return undefined;
-    Object.assign(mechanic, data);
-    return mechanic;
+export async function updateMechanic(id: number, data: Partial<{ name: string; specialty: string; email: string }>) {
+    try {
+        return await prisma.mechanic.update({
+            where: { id },
+            data
+        });
+    } catch (error) {
+        return null;
+    }
 }
 
-export function deleteMechanic(id: number): boolean {
-    const index = mechanics.findIndex(c => c.id === id);
-    if (index === -1) return false;
-    mechanics.splice(index,1);
-    return true;
+export async function deleteMechanic(id: number): Promise<boolean> {
+    try {
+        await prisma.mechanic.delete({
+            where: { id }
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
 }

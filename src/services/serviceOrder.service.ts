@@ -1,32 +1,77 @@
-import { mechanics } from "../data/mechanic";
-import { ServiceOrder, serviceOrdes } from "../data/serviceOrder";
+import { prisma } from "../lib/prisma";
+import { OrderStatus } from "@prisma/client";
 
-let nextId = 5;
-
-export function listServiceOrdes(): ServiceOrder[] {
-    return serviceOrdes
+export async function listServiceOrdes() {
+    return prisma.serviceOrder.findMany({
+        include: {
+            vehicle: true,
+            mechanic: true
+        },
+        orderBy: { id: "asc" }
+    });
 }
 
-export function findServiceOrderById(id: number): ServiceOrder | undefined {
-    return serviceOrdes.find(c => c.id === id);
+export async function findServiceOrderById(id: number) {
+    return prisma.serviceOrder.findUnique({
+        where: { id },
+        include: {
+            vehicle: true,
+            mechanic: true
+        }
+    });
 }
 
-export function createServiceOrder(data: Omit<ServiceOrder, 'id'>): ServiceOrder {
-    const newServiceOrder: ServiceOrder = {id: nextId++, ...data};
-    serviceOrdes.push(newServiceOrder);
-    return newServiceOrder;
+export async function createServiceOrder(data: {
+    vehicleId: number;
+    mechanicId?: number | null;
+    description: string;
+    status?: OrderStatus;
+}) {
+    return prisma.serviceOrder.create({
+        data: {
+            vehicleId: data.vehicleId,
+            mechanicId: data.mechanicId ?? null,
+            description: data.description,
+            status: data.status ?? OrderStatus.PENDING
+        },
+        include: {
+            vehicle: true,
+            mechanic: true
+        }
+    });
 }
 
-export function updateServiceOrder(id: number, data: Partial<ServiceOrder>): ServiceOrder | undefined {
-    const serviceOrder = findServiceOrderById(id);
-    if (!serviceOrder) return undefined;
-    Object.assign(serviceOrder, data);
-    return serviceOrder;
+export async function updateServiceOrder(
+    id: number,
+    data: Partial<{
+        vehicleId: number;
+        mechanicId: number | null;
+        description: string;
+        fecha: Date;
+        status: OrderStatus;
+    }>
+) {
+    try {
+        return await prisma.serviceOrder.update({
+            where: { id },
+            data,
+            include: {
+                vehicle: true,
+                mechanic: true
+            }
+        });
+    } catch (error) {
+        return null;
+    }
 }
 
-export function deleteServiceOrder(id: number): boolean {
-    const index = serviceOrdes.findIndex(c => c.id === id);
-    if (index === -1) return false;
-    serviceOrdes.splice(index,1);
-    return true;
+export async function deleteServiceOrder(id: number): Promise<boolean> {
+    try {
+        await prisma.serviceOrder.delete({
+            where: { id }
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
 }

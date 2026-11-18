@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:3000/serviceOrders
+method: POST
+headers:
+  Authorization: Bearer {{tokenCliente}}
+order: 8000

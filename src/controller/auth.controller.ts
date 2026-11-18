@@ -25,7 +25,7 @@ export async function login (req: Request, res: Response){
     if(!token){
         return res.status(401).json({error: 'Credenciales Invalidas'})
     }
-    return res.status(200).json(token);
+    return res.status(200).json({token});
 }
 
 export async function me(req:AuthRequest, res: Response) {

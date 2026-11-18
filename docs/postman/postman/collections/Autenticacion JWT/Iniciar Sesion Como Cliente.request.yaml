@@ -1,0 +1,18 @@
+$kind: http-request
+description: ""
+url: http://localhost:3000/auth/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"ana@cliente.com\",\r
+
+    \  \"password\": \"Clave123*\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('tokenCliente', pm.response.json().token);
+    language: text/javascript
+order: 6000

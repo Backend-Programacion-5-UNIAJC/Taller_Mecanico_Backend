@@ -1,6 +1,5 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Vehicle } from "@prisma/client";
 import {prisma} from "../lib/prisma"
-import { Vehicle } from '@prisma/client';
 
 
 function isNotFound( error: unknown): boolean {
@@ -17,7 +16,7 @@ export function findById(id: number){
 }
 
 // Crear Vehiculo
-export function create(data: Vehicle) {
+export function create(data: Omit<Vehicle, 'id'>) {
     return prisma.vehicle.create({ data });
 } 
 
