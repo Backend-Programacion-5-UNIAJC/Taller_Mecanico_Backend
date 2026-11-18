@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:3000/vehicles
+method: POST
+order: 10000

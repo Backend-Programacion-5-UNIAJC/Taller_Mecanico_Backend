@@ -1,0 +1,8 @@
+$kind: http-request
+url: http://localhost:3000/vehicles/:id
+method: DELETE
+headers:
+  Authorization: Bearer {{tokenCliente}}
+pathVariables:
+  id: ""
+order: 11000
