@@ -17,3 +17,19 @@ Dominio: Sistema backend para la gestión de un taller mecánico, permitiendo el
 | :--- | :--- |
 | **AlejandroCebM** | `alejandroceballos@estudiante.uniajc.edu.co` |
 | **Edward Fernandez** | `ejosephfernanez@estudiante.uniajc.edu.co` |
+
+## Matriz de permisos
+
+| Endpoint | Público (sin token) | CLIENT | MECHANIC | ADMIN |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET /service-orders` | Permitido | Permitido | Permitido | Permitido |
+| `GET /service-orders/mios` | Denegado (`401`) | Permitido (propias) | Permitido (asignadas) | Permitido (todas) |
+| `GET /service-orders/:id` | Permitido | Permitido | Permitido | Permitido |
+| `POST /service-orders` | Denegado (`401`) | Denegado (`403`) | Permitido | Permitido |
+| `PUT /service-orders/:id` | Denegado (`401`) | Denegado (`403`) | Solo dueño / asignado | Permitido |
+| `DELETE /service-orders/:id` | Denegado (`401`) | Denegado (`403`) | Solo dueño / asignado | Permitido |
+| `GET /mechanics` | Permitido | Permitido | Permitido | Permitido |
+| `GET /mechanics/:id` | Permitido | Permitido | Permitido | Permitido |
+| `POST /mechanics` | Denegado (`401`) | Denegado (`403`) | Denegado (`403`) | Permitido |
+| `PUT /mechanics/:id` | Denegado (`401`) | Denegado (`403`) | Denegado (`403`) | Permitido |
+| `DELETE /mechanics/:id` | Denegado (`401`) | Denegado (`403`) | Denegado (`403`) | Permitido |

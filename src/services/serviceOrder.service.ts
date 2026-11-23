@@ -1,77 +1,59 @@
-import { prisma } from "../lib/prisma";
-import { OrderStatus } from "@prisma/client";
+import * as serviceOrderRepository from '../repositories/serviceOrder.repository';
+import * as mechanicRepository from '../repositories/mechanic.repository';
+import { ServiceOrderInput } from '../models/serviceOrder.model';
+import { AuthUser } from '../models/user.model';
 
-export async function listServiceOrdes() {
-    return prisma.serviceOrder.findMany({
-        include: {
-            vehicle: true,
-            mechanic: true
-        },
-        orderBy: { id: "asc" }
-    });
+export async function listServiceOrders() {
+  return serviceOrderRepository.findAll();
 }
 
 export async function findServiceOrderById(id: number) {
-    return prisma.serviceOrder.findUnique({
-        where: { id },
-        include: {
-            vehicle: true,
-            mechanic: true
-        }
-    });
+  return serviceOrderRepository.findById(id);
 }
 
-export async function createServiceOrder(data: {
-    vehicleId: number;
-    mechanicId?: number | null;
-    description: string;
-    status?: OrderStatus;
-}) {
-    return prisma.serviceOrder.create({
-        data: {
-            vehicleId: data.vehicleId,
-            mechanicId: data.mechanicId ?? null,
-            description: data.description,
-            status: data.status ?? OrderStatus.PENDING
-        },
-        include: {
-            vehicle: true,
-            mechanic: true
-        }
-    });
+// Si quien crea es MECHANIC, la orden queda asignada a su perfil de mecánico.
+// El ADMIN puede indicar mechanicId en el body.
+export async function createServiceOrder(data: ServiceOrderInput, user: AuthUser) {
+  if (user.role === 'MECHANIC') {
+    const mechanic = await mechanicRepository.findByUserId(user.id);
+    data.mechanicId = mechanic ? mechanic.id : null;
+  }
+  return serviceOrderRepository.create(data);
 }
 
-export async function updateServiceOrder(
-    id: number,
-    data: Partial<{
-        vehicleId: number;
-        mechanicId: number | null;
-        description: string;
-        fecha: Date;
-        status: OrderStatus;
-    }>
+// Autorización por mecánico asignado ("dueño" de la orden) o ADMIN
+export async function updateServiceOrderAsOwner(
+  id: number,
+  user: AuthUser,
+  data: Partial<ServiceOrderInput>
 ) {
-    try {
-        return await prisma.serviceOrder.update({
-            where: { id },
-            data,
-            include: {
-                vehicle: true,
-                mechanic: true
-            }
-        });
-    } catch (error) {
-        return null;
-    }
+  const order = await serviceOrderRepository.findWithOwner(id);
+  if (!order) throw new Error('NOT_FOUND');
+  if (user.role !== 'ADMIN' && order.mechanic?.userId !== user.id) {
+    throw new Error('FORBIDDEN');
+  }
+  return serviceOrderRepository.update(id, data);
 }
 
-export async function deleteServiceOrder(id: number): Promise<boolean> {
-    try {
-        await prisma.serviceOrder.delete({
-            where: { id }
-        });
-        return true;
-    } catch (error) {
-        return false;
-    }
+// Cierre del hueco en DELETE
+export async function deleteServiceOrderAsOwner(id: number, user: AuthUser) {
+  const order = await serviceOrderRepository.findWithOwner(id);
+  if (!order) throw new Error('NOT_FOUND');
+  if (user.role !== 'ADMIN' && order.mechanic?.userId !== user.id) {
+    throw new Error('FORBIDDEN');
+  }
+  return serviceOrderRepository.remove(id);
+}
+
+export async function getMyServiceOrders(user: AuthUser) {
+  if (user.role === 'ADMIN') {
+    return serviceOrderRepository.findAll();
+  }
+
+  const mechanic = await mechanicRepository.findByUserId(user.id);
+  if (!mechanic) {
+    return [];
+  }
+
+  return serviceOrderRepository.findByMechanicId(mechanic.id);
 }

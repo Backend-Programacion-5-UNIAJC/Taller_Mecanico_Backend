@@ -36,11 +36,17 @@ export async function remove(id: number): Promise<boolean> {
     }
 }
 
-//el curso junto con el usuario dueño (el userId de su instructor).
+
 export function findWithOwner(id: number) {
 return prisma.serviceOrder.findUnique({
 where: { id },
 include: { mechanic: { select: { userId: true } } },
 });
+}
+
+export function findByMechanicId(mechanicId: number) {
+  return prisma.serviceOrder.findMany({
+    where: { mechanicId },
+  });
 }
 
