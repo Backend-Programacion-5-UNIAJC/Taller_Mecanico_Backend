@@ -14,7 +14,9 @@ export function findById(id: number) {
 }
 
 export function findByUserId(userId: number) {
-    return prisma.mechanic.findUnique({ where: { userId } });
+  return prisma.mechanic.findUnique({
+    where: { userId },
+  });
 }
 
 export function create(data: Omit<Mechanic, 'id'>) {

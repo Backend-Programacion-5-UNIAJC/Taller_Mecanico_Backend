@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:3000/serviceOrders/mios
+method: GET
+headers:
+  Authorization: Bearer {{tokenMecanico}}
+order: 12000
