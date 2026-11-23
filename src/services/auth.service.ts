@@ -12,7 +12,7 @@ function getSecret(): string{
 
 export async function register({name,email,password}: RegisterInput){
     const hashedPassword = await bcrypt.hash(password, 10);
-    return userRepository.create({name,email,password, role: 'CLIENT'});
+    return userRepository.create({name,email,password:hashedPassword, role: 'CLIENT'});
 }
 
 //funcion que devuelve  null si las credenciales no son validas 

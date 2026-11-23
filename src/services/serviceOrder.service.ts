@@ -2,13 +2,18 @@ import * as serviceOrderRepository from '../repositories/serviceOrder.repository
 import * as mechanicRepository from '../repositories/mechanic.repository';
 import { ServiceOrderInput } from '../models/serviceOrder.model';
 import { AuthUser } from '../models/user.model';
+import { AppError } from '../errors/app-error';
 
 export async function listServiceOrders() {
   return serviceOrderRepository.findAll();
 }
 
 export async function findServiceOrderById(id: number) {
-  return serviceOrderRepository.findById(id);
+  const order = await serviceOrderRepository.findById(id);
+  if (!order) {
+    throw new AppError(404, 'Orden de servicio no encontrada', 'SERVICE_ORDER_NOT_FOUND');
+  }
+  return order;
 }
 
 // Si quien crea es MECHANIC, la orden queda asignada a su perfil de mecánico.
@@ -21,27 +26,34 @@ export async function createServiceOrder(data: ServiceOrderInput, user: AuthUser
   return serviceOrderRepository.create(data);
 }
 
+async function assertOwnerOrAdmin(id: number, user: AuthUser) {
+  const order = await serviceOrderRepository.findWithOwner(id);
+  if (!order) {
+    throw new AppError(404, 'Orden de servicio no encontrada', 'SERVICE_ORDER_NOT_FOUND');
+  }
+  if (user.role !== 'ADMIN' && order.mechanic?.userId !== user.id) {
+    throw new AppError(
+      403,
+      'Solo el mecanico asignado o un administrador puede gestionar esta orden',
+      'NOT_SERVICE_ORDER_OWNER'
+    );
+  }
+  return order;
+}
+
 // Autorización por mecánico asignado ("dueño" de la orden) o ADMIN
 export async function updateServiceOrderAsOwner(
   id: number,
   user: AuthUser,
   data: Partial<ServiceOrderInput>
 ) {
-  const order = await serviceOrderRepository.findWithOwner(id);
-  if (!order) throw new Error('NOT_FOUND');
-  if (user.role !== 'ADMIN' && order.mechanic?.userId !== user.id) {
-    throw new Error('FORBIDDEN');
-  }
+  await assertOwnerOrAdmin(id, user);
   return serviceOrderRepository.update(id, data);
 }
 
 // Cierre del hueco en DELETE
 export async function deleteServiceOrderAsOwner(id: number, user: AuthUser) {
-  const order = await serviceOrderRepository.findWithOwner(id);
-  if (!order) throw new Error('NOT_FOUND');
-  if (user.role !== 'ADMIN' && order.mechanic?.userId !== user.id) {
-    throw new Error('FORBIDDEN');
-  }
+  await assertOwnerOrAdmin(id, user);
   return serviceOrderRepository.remove(id);
 }
 
