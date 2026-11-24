@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
 import { AppError } from '../errors/app-error';
+import { ZodError } from 'zod';
 
 // Ruta que no existe: se convierte en un error mas, con el mismo formato.
 export function notFoundMiddleware(req: Request, res: Response, next: NextFunction) {
@@ -9,20 +10,39 @@ export function notFoundMiddleware(req: Request, res: Response, next: NextFuncti
 
 // Middleware de errores: Express lo reconoce porque tiene CUATRO parametros.
 // Debe montarse al FINAL de index.ts, despues de todas las rutas.
-export function errorMiddleware(err: unknown, req: Request, res: Response, next: NextFunction) {
+export function errorMiddleware(err: unknown, _req: Request, res: Response, _next: NextFunction) {
   // 1. Errores esperados de nuestra API (400, 401, 403, 404, 409)
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       error: {
         code: err.code,
         message: err.message,
-        ...(err.details ? { details: err.details } : {}),
+        ...(err.details !== undefined ? { details: err.details } : {}),
       },
     });
   }
 
-  // 2. JSON mal escrito en el body (lo lanza express.json)
-  if (err instanceof SyntaxError && 'body' in err) {
+  // 2. Errores de validacion con Zod
+  if (err instanceof ZodError) {
+    const details = err.issues.map((issue) => ({
+      field: issue.path.join('.') || 'body',
+      message: issue.message,
+    }));
+
+    return res.status(400).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Error de validacion en los datos enviados',
+        details,
+      },
+    });
+  }
+
+  // 3. JSON mal escrito en el body (lo lanza express.json)
+  if (
+    err instanceof SyntaxError &&
+    (('status' in err && (err as { status?: number }).status === 400) || 'body' in err)
+  ) {
     return res.status(400).json({
       error: {
         code: 'INVALID_JSON',
@@ -31,7 +51,7 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     });
   }
 
-  // 3. Errores conocidos de Prisma
+  // 4. Errores conocidos de Prisma
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
       return res.status(409).json({
@@ -50,7 +70,6 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
       });
     }
     if (err.code === 'P2003') {
-      // Referencia a un registro que no existe, o borrar algo de lo que otros dependen
       return res.status(409).json({
         error: {
           code: 'RELATION_CONFLICT',
@@ -60,7 +79,7 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     }
   }
 
-  // 4. La base de datos no responde (al arrancar, o se cayo la conexion: P1001, P1002, P1017)
+  // 5. La base de datos no responde (al arrancar, o se cayo la conexion: P1001, P1002, P1017)
   const sinBase = ['P1001', 'P1002', 'P1017'];
   if (
     err instanceof Prisma.PrismaClientInitializationError ||
@@ -75,7 +94,7 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     });
   }
 
-  // 5. Inesperado: el detalle completo va al log del servidor, nunca al cliente en produccion.
+  // 6. Inesperado: el detalle completo va al log del servidor, nunca al cliente en produccion.
   console.error(err);
   const isDev = process.env.NODE_ENV !== 'production';
   res.status(500).json({

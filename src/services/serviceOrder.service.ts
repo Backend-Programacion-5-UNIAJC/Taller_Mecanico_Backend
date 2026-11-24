@@ -42,11 +42,7 @@ async function assertOwnerOrAdmin(id: number, user: AuthUser) {
 }
 
 // Autorización por mecánico asignado ("dueño" de la orden) o ADMIN
-export async function updateServiceOrderAsOwner(
-  id: number,
-  user: AuthUser,
-  data: Partial<ServiceOrderInput>
-) {
+export async function updateServiceOrderAsOwner(id: number,user: AuthUser,data: Partial<ServiceOrderInput>) {
   await assertOwnerOrAdmin(id, user);
   return serviceOrderRepository.update(id, data);
 }
