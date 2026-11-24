@@ -1,0 +1,9 @@
+$kind: http-request
+description: ""
+url: http://localhost:3000/auth/me
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenFalse}}"
+order: 5000
