@@ -1,15 +1,16 @@
 import { Router } from 'express';
 import { register, login, me } from '../controller/auth.controller';
 import { requireAuth} from '../middlewares/auth.middleware';
-
+import { validate } from '../middlewares/validate.middleware';
+import { registerSchema, loginSchema } from '../schemas/auth.schema';
 
 
 
 const router = Router();
 
-router.post('/register',register);
-router.post('/login',login);
-router.get('/me',requireAuth, me);
+router.post('/register', validate(registerSchema), register);
+router.post('/login', validate(loginSchema), login);
+router.get('/me', requireAuth, me);
 
 
 export default router;
