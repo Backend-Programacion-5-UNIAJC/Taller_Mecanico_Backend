@@ -1,0 +1,18 @@
+$kind: http-request
+description: ""
+url: http://localhost:3000/serviceOrders/1
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \  \"vehicleId\": 1,\r
+
+    \  \"description\": \"Cambio de aceite y filtros\"\r
+
+    }\r\n"
+auth:
+  type: bearer
+  credentials:
+    token: "{{mechanicToken}}"
+order: 8000
